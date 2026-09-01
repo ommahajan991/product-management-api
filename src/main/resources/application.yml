@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: products-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/product_management_api
+    username: ${DB_USERNAME:products_user}
+    password: ${DB_PASSWORD:products_pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secretKey: ${JWT_SECRET:dev-only-placeholder-not-for-production-use-change-me}
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:products_test_db;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect

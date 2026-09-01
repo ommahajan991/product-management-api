@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: products-api-db
+    environment:
+      POSTGRES_DB: product_management_api
+      POSTGRES_USER: ${DB_USERNAME:-products_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-products_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-products_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: products-api-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/product_management_api
+      DB_USERNAME: ${DB_USERNAME:-products_user}
+      DB_PASSWORD: ${DB_PASSWORD:-products_pass}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+volumes:
+  postgres_data:
